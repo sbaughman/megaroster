@@ -54,12 +54,13 @@ var Megaroster = function() {
       $(this.student_name).val('').focus();
     });
 
-    $('button.delete').on('click', function(ev) {
+    $(document).on('click', 'button.delete', function(ev) {
       ev.preventDefault();
       // Remove student from array
       // Remove li from ol
       $(this).closest('li').remove();
       // Update local storage
+      $(this.student_name).val('').focus();
     });
 
   };
