@@ -12,11 +12,12 @@ var Megaroster = function() {
 
   this.load = function() {
     try {
-      self.students = JSON.parse(localStorage.students);
-      $.each(self.students, function(index, student_data) {
+      var student_data_objects = JSON.parse(localStorage.students);
+      $.each(student_data_objects, function(index, student_data) {
         var student = new Student();
-        student.init(student_data.name);
+        student.init(student_data);
         student.appendToList();
+        self.students.push(student);
       });
     }
     catch(err) {
@@ -36,7 +37,9 @@ var Megaroster = function() {
 
   this.addStudent = function(student_name) {
     var student = new Student();
-    student.init(student_name);
+    student.init({
+      name: student_name
+    });
 
     self.students.push(student);
     student.appendToList();
@@ -46,17 +49,26 @@ var Megaroster = function() {
 
   this.init = function() {
     self.students = [];
+    Student.counter = 0;
     self.load();
 
     $(document).on('click', 'button.delete', function(ev) {
+      var li = $(this).closest('li');
       // Remove it from the array
+      var id = li.attr('data-id');
 
+      $.each(self.students, function(index, current_student) {
+        if (current_student.id.toString() === id.toString()) {
+          self.students.splice(index, 1);
+          return false;
+        }
+      });
 
+      // self.students.splice(self.students.indexOf(current_student), 1);
       // Remove it from the <ol>
-      $(this).closest('li').remove();
-
+      li.remove();
       // Update localStorage
-      // WAIT UNTIL TOMORROW
+      self.save();
     });
 
     $('#new_student_form').on('submit', function (ev) {
