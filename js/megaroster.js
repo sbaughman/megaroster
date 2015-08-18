@@ -23,8 +23,15 @@ var Megaroster = function() {
   };
 
   this.appendToList = function(student_name) {
+    // Grab the *template* list item from the page, make template for new li
+    var li = $('#list_item_template').clone();
+    li.removeAttr('id')
+      .addClass('student')
+      .prepend(student_name)
+      .removeClass('hidden');
+
     // append an <li> with student name to <ol>
-    $('#students').append('<li class="list-group-item">' + student_name + '</li>');
+    $('#students').append(li);
   };
 
   this.addStudent = function(student_name) {
@@ -38,9 +45,7 @@ var Megaroster = function() {
     self.students = [];
     self.load();
 
-
-    $('#new_student_form').on('submit', function(ev) {
-      ev.preventDefault();
+    $('#new_student_form').on('submit', function() {
       // gets value from student_name input field
       var student_name = $(this.student_name).val().trim();
 
@@ -48,6 +53,15 @@ var Megaroster = function() {
       // clear entry field and focus
       $(this.student_name).val('').focus();
     });
+
+    $('button.delete').on('click', function(ev) {
+      ev.preventDefault();
+      // Remove student from array
+      // Remove li from ol
+      $(this).closest('li').remove();
+      // Update local storage
+    });
+
   };
 
 };
