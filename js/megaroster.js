@@ -13,8 +13,10 @@ var Megaroster = function() {
   this.load = function() {
     try {
       self.students = JSON.parse(localStorage.students);
-      $.each(self.students, function(index, student_name) {
-        self.appendToList(student_name);
+      $.each(self.students, function(index, student_data) {
+        var student = new Student();
+        student.init(student_data.name);
+        student.appendToList();
       });
     }
     catch(err) {
@@ -22,22 +24,23 @@ var Megaroster = function() {
     }
   };
 
-  this.appendToList = function(student_name) {
-    // Grab the *template* list item from the page, make template for new li
-    var li = $('#list_item_template').clone();
-    li.removeAttr('id')
-      .addClass('student')
-      .prepend(student_name)
-      .removeClass('hidden');
-
-    // append an <li> with student name to <ol>
-    $('#students').append(li);
-  };
+  // this.appendToList = function(student_name) {
+  //   var li = $('#list_item_template').clone();
+  //   li.removeAttr('id')
+  //     .addClass('student')
+  //     .prepend(student_name)
+  //     .removeClass('hidden');
+  //
+  //   $('#students').append(li);
+  // };
 
   this.addStudent = function(student_name) {
-    // pushes value from form into students array
-    self.students.push(student_name);
-    self.appendToList(student_name);
+    var student = new Student();
+    student.init(student_name);
+
+    self.students.push(student);
+    student.appendToList();
+
     self.save();
   };
 
@@ -45,26 +48,28 @@ var Megaroster = function() {
     self.students = [];
     self.load();
 
-    $('#new_student_form').on('submit', function() {
-      // gets value from student_name input field
-      var student_name = $(this.student_name).val().trim();
+    $(document).on('click', 'button.delete', function(ev) {
+      // Remove it from the array
+
+
+      // Remove it from the <ol>
+      $(this).closest('li').remove();
+
+      // Update localStorage
+      // WAIT UNTIL TOMORROW
+    });
+
+    $('#new_student_form').on('submit', function (ev) {
+      ev.preventDefault();
+      var student_name = $(this.student_name).val();
 
       self.addStudent(student_name);
-      // clear entry field and focus
-      $(this.student_name).val('').focus();
-    });
 
-    $(document).on('click', 'button.delete', function(ev) {
-      ev.preventDefault();
-      // Remove student from array
-      // Remove li from ol
-      $(this).closest('li').remove();
-      // Update local storage
-      $(this.student_name).val('').focus();
+      $(this.student_name)
+        .val('')
+        .focus();
     });
-
   };
-
 };
 
 var roster = new Megaroster();
