@@ -60,8 +60,40 @@ var Megaroster = function() {
 
     label.addClass('hidden');
     li.find('.btn-group').addClass('hidden');
-
     li.append(edit_form);
+    edit_form.find('input[name=student_name]')
+      .val(label.text())
+      .focus()
+      .select();
+  };
+
+  this.revertEditForm = function(ev) {
+    var li, edit_form, label;
+    li = $(this).closest('li');
+    edit_form = $(this).closest('form');
+    label = li.find('label');
+
+    edit_form.remove();
+    label.removeClass('hidden');
+    li.find('.btn-group').removeClass('hidden');
+  };
+
+  this.updateStudent = function(ev) {
+    ev.preventDefault();
+    // Grab the id of the updated student
+    var li = $(this).closest('li');
+    var id = li.attr('data-id');
+    // Find the student record with that id
+    var student = Student.getStudentById(id);
+    // Change the name on the student object
+    student.name = $(this.student_name).val();
+    // Update displayed student name in li
+    $(this).siblings('label').text(student.name);
+    // get rid of edit form. Use .apply and (this) to pass proper arguments
+    self.revertEditForm.apply(this);
+    // Update local storage
+    self.save();
+
 
   };
 
@@ -71,7 +103,11 @@ var Megaroster = function() {
     Student.counter = 0;
     self.load();
 
+    $(document).on('click', 'button.cancel', self.revertEditForm);
+
     $(document).on('click', 'button.edit', self.createEditForm);
+
+    $(document).on('submit', 'form.edit', self.updateStudent);
 
     $(document).on('click', 'button.delete', function(ev) {
       var li = $(this).closest('li');
